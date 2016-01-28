@@ -70,7 +70,9 @@ done
 #####################
 
 if ! $args_headers; then
-    titles=( $(head -n 1 - | tr ',' '\n') )
+    # don't use head here since it consumes more than a line
+    read line
+    titles=( $(echo "$line" | tr ',' '\n') )
 fi
 
 #############
