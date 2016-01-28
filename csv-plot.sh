@@ -79,9 +79,9 @@ fi
 # EXECUTION #
 #############
 
-# it seems that the process substitution breaks the stdin
-# so we just use a different file descriptor
-exec 7<&0
+tmpfile="$(mktemp "csv-plot-XXXXXX.csv")"
+cat > "$tmpfile"
+trap "rm $tmpfile" EXIT
 
 gnuplot <(cat <<EOF
     # output to file
@@ -96,7 +96,7 @@ gnuplot <(cat <<EOF
     # plot the columns
     plot $(for (( n=1; n < ${#titles[@]}; n++ )); do
         # print the data source
-        echo -n "'<&7' using 1:$((n+1)) title \"${titles[n]}\""
+        echo -n "'$tmpfile' using 1:$((n+1)) title \"${titles[n]}\""
         # join by commas
         (( n < ${#titles[@]} - 1 )) && echo -n ', '
     done)
